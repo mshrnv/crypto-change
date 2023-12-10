@@ -12,14 +12,18 @@ class MexcClient:
             "Content-Type": "application/json"
         }
 
-    def get_tickers(self):
+    def get_tickers(self) -> dict | None:
         """Returns all tickers list"""
-        url = "https://api.mexc.com/api/v3/ticker/bookTicker"
-        response = self.client.get(url, headers=self.headers)
-        return response.json()
+        try:
+            url = "https://api.mexc.com/api/v3/ticker/bookTicker"
+            response = self.client.get(url, headers=self.headers)
+            return response.json()
+        except Exception as error:
+            print(f"Ошибка получения тикеров: {error}")
+            return None
 
     @staticmethod
-    def filter_tickers(tickers):
+    def filter_tickers(tickers: dict) -> dict:
         """Restructure of list with all tickers"""
         result = {}
         for ticker in tickers:
@@ -36,8 +40,11 @@ class MexcClient:
 
         return result
 
-    def get_data(self):
+    def get_data(self) -> dict | None:
         """Returns info about all needle tickers"""
         tickers = self.get_tickers()
+        if not tickers:
+            return None
+
         data = self.filter_tickers(tickers)
         return data

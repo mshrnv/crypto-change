@@ -2,6 +2,7 @@
 import time
 import redis
 from mexc import MexcClient
+from src.utils import get_timestamp
 
 if __name__ == "__main__":
     # Connection with Redis
@@ -12,7 +13,14 @@ if __name__ == "__main__":
     # Every 3sec updating redis with new tickers
     while True:
         tickers = mexc.get_data()
-        print(tickers)
+
+        if not tickers:
+            time.sleep(10)
+            continue
+
+        timestamp = get_timestamp()
+        print(f"Получены тикеры - {timestamp}")
+
         for ticker, data in tickers.items():
             # Structure of Redis item
             client.hset(ticker, mapping={
@@ -22,5 +30,4 @@ if __name__ == "__main__":
                 'bid_size': data['bid_size'],
             })
 
-        print('-------')
         time.sleep(3)

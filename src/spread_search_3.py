@@ -1,17 +1,12 @@
 """Module to search spread"""
-from datetime import datetime
 from functools import reduce
 import time
+import pymongo
 import redis
 import networkx as nx
 import matplotlib.pyplot as plt
-from pymongo import MongoClient
-from consts import chains
-
-
-def get_timestamp():
-    """Returns current timestamp"""
-    return datetime.now()
+from src.consts import chains
+from src.utils import get_timestamp
 
 
 def get_redis_data(redis_client: redis.Redis):
@@ -24,7 +19,7 @@ def get_redis_data(redis_client: redis.Redis):
     return data
 
 
-def prepare_currencies_data(currencies_data):
+def prepare_currencies_data(currencies_data: dict):
     """Transform currencies dict data to (c1, c1): [ask|bid]"""
     data = {}
     for ticker, values in currencies_data.items():
@@ -40,7 +35,7 @@ def prepare_currencies_data(currencies_data):
     return data
 
 
-def create_graph(prepared_data):
+def create_graph(prepared_data: dict):
     """Creates multi di graph"""
     graph = nx.MultiDiGraph()
 
@@ -51,7 +46,7 @@ def create_graph(prepared_data):
     return graph
 
 
-def draw_graph(graph, weights_data):
+def draw_graph(graph: nx.Graph, weights_data: dict):
     """Graph visualization"""
     pos = nx.circular_layout(graph)
     plt.figure(figsize=(10, 10))
@@ -73,14 +68,14 @@ def draw_graph(graph, weights_data):
     plt.show()
 
 
-def calc_chain_spread(crypto_chain):
+def calc_chain_spread(crypto_chain: list) -> float:
     """Calculating spred of chain"""
     result = reduce(lambda x, y: x * y, crypto_chain)
     spread = result * 100 - 100
     return spread
 
 
-def calc_all_chains_spread(weights, all_chains, mongo_collection):
+def calc_all_chains_spread(weights: dict, all_chains: list, mongo_collection: pymongo.collection):
     """Chains bruteforce for profitability and saving to MongoDB"""
     for chain in all_chains:
         chain_path = [
@@ -112,7 +107,7 @@ if __name__ == '__main__':
     )
 
     # MongoDB Connection
-    mongo_client = MongoClient(
+    mongo_client = pymongo.MongoClient(
         '127.0.0.1',
         27017,
     )
