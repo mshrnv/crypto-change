@@ -6,5 +6,5 @@
 - [ ] Выставление ордеров
 - [ ] ENV
 - [ ] Оптимизация скорости
-- [ ] Requirements
-- [ ] Docker compose
+- [x] Requirements
+- [x] Docker compose

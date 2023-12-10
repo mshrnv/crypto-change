@@ -1,12 +1,12 @@
 """Module to search spread"""
+from datetime import datetime
+from functools import reduce
 import time
 import redis
 import networkx as nx
 import matplotlib.pyplot as plt
-from datetime import datetime
-from functools import reduce
 from pymongo import MongoClient
-from consts import currencies, chains
+from consts import chains
 
 
 def get_timestamp():

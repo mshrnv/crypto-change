@@ -2,7 +2,6 @@
 import time
 import redis
 from mexc import MexcClient
-from consts import needle
 
 if __name__ == "__main__":
     # Connection with Redis
