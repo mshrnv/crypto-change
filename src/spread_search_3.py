@@ -5,6 +5,8 @@ import pymongo
 import redis
 import networkx as nx
 import matplotlib.pyplot as plt
+
+from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB, MONGO_HOST, MONGO_PORT
 from src.consts import chains
 from src.utils import get_timestamp
 
@@ -99,20 +101,22 @@ def calc_all_chains_spread(weights: dict, all_chains: list, mongo_collection: py
 if __name__ == '__main__':
     # Redis Connection
     client = redis.Redis(
-        host='localhost',
-        port=6379,
-        db=0,
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_DB,
         charset="utf-8",
         decode_responses=True
     )
 
     # MongoDB Connection
     mongo_client = pymongo.MongoClient(
-        '127.0.0.1',
-        27017,
+        MONGO_HOST,
+        MONGO_PORT,
     )
 
+    # DB = crypto
     db = mongo_client.crypto
+    # Collection = mexc_spreads_3
     mongo_spreads = db.mexc_spreads_3
 
     # Every 10sec searching for profitability chains

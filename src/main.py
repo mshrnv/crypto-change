@@ -2,11 +2,16 @@
 import time
 import redis
 from mexc import MexcClient
+from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB
 from src.utils import get_timestamp
 
 if __name__ == "__main__":
     # Connection with Redis
-    client = redis.Redis(host='localhost', port=6379, db=0)
+    client = redis.Redis(
+        host=REDIS_HOST,
+        port=REDIS_PORT,
+        db=REDIS_DB
+    )
     # MEXC client
     mexc = MexcClient()
 
