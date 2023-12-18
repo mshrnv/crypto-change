@@ -7,7 +7,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB, MONGO_HOST, MONGO_PORT
-from src.consts import chains
+from src.consts import chains, AMOUNT
 from src.utils import get_timestamp
 
 
@@ -31,43 +31,10 @@ def prepare_currencies_data(currencies_data: dict):
         else:
             ccy1, ccy2 = ticker[:3], ticker[3:]
 
-        data[(ccy1, ccy2)] = 1 / float(values['bid'])
-        data[(ccy2, ccy1)] = float(values['ask'])
+        data[(ccy1, ccy2)] = float(values['ask'])
+        data[(ccy2, ccy1)] = 1 / float(values['bid'])
 
     return data
-
-
-def create_graph(prepared_data: dict):
-    """Creates multi di graph"""
-    graph = nx.MultiDiGraph()
-
-    for pair, value in prepared_data.items():
-        ccy1, ccy2, = pair
-        graph.add_edge(ccy1, ccy2, weight=value)
-
-    return graph
-
-
-def draw_graph(graph: nx.Graph, weights_data: dict):
-    """Graph visualization"""
-    pos = nx.circular_layout(graph)
-    plt.figure(figsize=(10, 10))
-
-    nx.draw(
-        graph, pos, edge_color='black', width=1, linewidths=1,
-        node_size=1600, node_color='pink', alpha=0.9,
-        labels={node: node for node in graph.nodes()}
-    )
-
-    nx.draw_networkx_edge_labels(
-        graph, pos,
-        edge_labels=weights_data,
-        font_color='red',
-        verticalalignment='bottom'
-    )
-
-    plt.axis('off')
-    plt.show()
 
 
 def calc_chain_spread(crypto_chain: list) -> float:
@@ -77,25 +44,70 @@ def calc_chain_spread(crypto_chain: list) -> float:
     return spread
 
 
-def calc_all_chains_spread(weights: dict, all_chains: list, mongo_collection: pymongo.collection):
+def calc_all_chains_spread(
+        weights: dict,
+        all_chains: list,
+        mongo_collection: pymongo.collection,
+        prices: dict,
+        min_spread: float = 0.9
+):
     """Chains bruteforce for profitability and saving to MongoDB"""
+
     for chain in all_chains:
         chain_path = [
-            weights[(chain[0], chain[1], 0)],
-            weights[(chain[1], chain[2], 0)],
-            weights[(chain[2], chain[3], 0)],
+            weights[(chain[0], chain[1])],
+            weights[(chain[1], chain[2])],
+            weights[(chain[2], chain[3])],
         ]
 
+        if chain[1] in ['BTC', 'ETH']:
+            mid_symbol = chain[2] + chain[1]
+            mid_side = 'BUY'
+        else:
+            mid_symbol = chain[1] + chain[2]
+            mid_side = 'SELL'
+
+        orders = [
+            {
+                'symbol': chain[1] + chain[0],
+                'side': 'BUY',
+                'type': 'LIMIT',
+                'price': prices[chain[1] + chain[0]]['ask'],
+                'quantity': AMOUNT
+            },
+            {
+                'symbol': mid_symbol,
+                'side': mid_side,
+                'type': 'LIMIT',
+                'price': prices[mid_symbol]['ask' if mid_side == 'BUY' else 'bid'],
+                'quantity': AMOUNT * weights[(chain[0], chain[1])]
+            },
+            {
+                'symbol': chain[2] + chain[3],
+                'side': 'SELL',
+                'type': 'LIMIT',
+                'price': prices[chain[2] + chain[3]]['bid'],
+                'quantity': AMOUNT * weights[(chain[0], chain[1])] * weights[(chain[1], chain[2])]
+            }
+        ]
+
+        spread = round(calc_chain_spread(chain_path), 4)
         mongo_collection.insert_one({
-            "chain": " -> ".join(chain),
-            "spread": round(calc_chain_spread(chain_path), 4),
+            "chain": chain,
+            "spread": spread,
             "timestamp": get_timestamp()
         })
 
         print('-----------------')
-        print(" -> ".join(chain))
+        print(*chain, sep=' -> ')
         print(*chain_path, sep=' -> ')
-        print('Spread: ' + str(round(calc_chain_spread(chain_path), 4)) + '%')
+        print('Spread: ' + str(spread) + '%')
+
+        if spread >= min_spread:
+            print(f'SPREAD >= {min_spread} FOUNDED')
+            return orders
+
+    return None
 
 
 if __name__ == '__main__':
@@ -123,10 +135,11 @@ if __name__ == '__main__':
     while True:
         currencies = get_redis_data(client)
         data = prepare_currencies_data(currencies)
-        currencies_graph = create_graph(data)
-        print(currencies_graph)
+        chain_orders = calc_all_chains_spread(data, chains, mongo_spreads, currencies)
 
-        attrs = nx.get_edge_attributes(currencies_graph, 'weight')
-        calc_all_chains_spread(attrs, chains, mongo_spreads)
+        if chain_orders is not None:
+            break
 
         time.sleep(10)
+
+    print(chain_orders)

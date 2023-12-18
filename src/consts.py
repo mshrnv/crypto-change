@@ -1,5 +1,7 @@
 """Constants"""
 
+AMOUNT = 10
+
 # Needle pairs of crypto
 needle = [
     'BTCUSDT',
@@ -23,8 +25,8 @@ currencies = [
 ]
 
 chains = [
-    ['USDT', 'ETH', 'BTC', 'USDT'],
-    ['USDT', 'BTC', 'ETH', 'USDT'],
+    # ['USDT', 'ETH', 'BTC', 'USDT'],
+    # ['USDT', 'BTC', 'ETH', 'USDT'],
     ['USDT', 'BTC', 'XRP', 'USDT'],
     ['USDT', 'XRP', 'BTC', 'USDT'],
     ['USDT', 'SOL', 'BTC', 'USDT'],
