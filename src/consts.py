@@ -1,44 +1,44 @@
 """Constants"""
 
-AMOUNT = 10
+AMOUNT = 8.05
 
 # Needle pairs of crypto
 needle = [
-    'BTCUSDT',
-    'ETHUSDT',
-    'SOLUSDT',
-    'XRPUSDT',
-    'MXUSDT',
-    'ELFUSDT',
+    'BTCUSDC',
+    'ETHUSDC',
+    'SOLUSDC',
+    'XRPUSDC',
+    'MXUSDC',
+    # 'ELFUSDC',
     'XRPBTC',
     'ETHBTC',
-    'MXBTC',
+    # 'MXBTC',
     'SOLBTC',
     'ELFBTC',
     'MXETH',
-    'XRPETH',
-    'ELFETH'
+    # 'XRPETH',
+    'ELFETH',
 ]
 
 currencies = [
-    'BTC', 'USDT', 'ETH', 'SOL', 'XRP', 'ELF', 'MX'
+    'BTC', 'USDC', 'ETH', 'SOL', 'XRP', 'ELF', 'MX', 'USDC'
 ]
 
 chains = [
-    # ['USDT', 'ETH', 'BTC', 'USDT'],
-    # ['USDT', 'BTC', 'ETH', 'USDT'],
-    ['USDT', 'BTC', 'XRP', 'USDT'],
-    ['USDT', 'XRP', 'BTC', 'USDT'],
-    ['USDT', 'SOL', 'BTC', 'USDT'],
-    ['USDT', 'BTC', 'SOL', 'USDT'],
-    ['USDT', 'BTC', 'ELF', 'USDT'],
-    ['USDT', 'ELF', 'BTC', 'USDT'],
-    ['USDT', 'ETH', 'ELF', 'USDT'],
-    ['USDT', 'ELF', 'ETH', 'USDT'],
-    ['USDT', 'BTC', 'MX', 'USDT'],
-    ['USDT', 'MX', 'BTC', 'USDT'],
-    ['USDT', 'ETH', 'MX', 'USDT'],
-    ['USDT', 'MX', 'ETH', 'USDT'],
-    ['USDT', 'ETH', 'XRP', 'USDT'],
-    ['USDT', 'XRP', 'ETH', 'USDT'],
+    # ['USDC', 'ETH', 'BTC', 'USDC'],
+    ['USDC', 'BTC', 'ETH', 'USDC'],
+    ['USDC', 'BTC', 'XRP', 'USDC'],
+    # ['USDC', 'XRP', 'BTC', 'USDC'],
+    # ['USDC', 'SOL', 'BTC', 'USDC'],
+    ['USDC', 'BTC', 'SOL', 'USDC'],
+    # ['USDC', 'BTC', 'ELF', 'USDC'],
+    # ['USDC', 'ELF', 'BTC', 'USDC'],
+    # ['USDC', 'ETH', 'ELF', 'USDC'],
+    # ['USDC', 'ELF', 'ETH', 'USDC'],
+    ['USDC', 'BTC', 'MX', 'USDC'],
+    # ['USDC', 'MX', 'BTC', 'USDC'],
+    ['USDC', 'ETH', 'MX', 'USDC'],
+    # ['USDC', 'MX', 'ETH', 'USDC'],
+    ['USDC', 'ETH', 'XRP', 'USDC'],
+    # ['USDC', 'XRP', 'ETH', 'USDC'],
 ]

@@ -3,11 +3,10 @@ from functools import reduce
 import time
 import pymongo
 import redis
-import networkx as nx
-import matplotlib.pyplot as plt
 
-from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB, MONGO_HOST, MONGO_PORT
+from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB, MONGO_HOST, MONGO_PORT, MEXC_ACCESS_KEY, MEXC_SECRET_KEY
 from src.consts import chains, AMOUNT
+from src.mexc import MexcClient
 from src.utils import get_timestamp
 
 
@@ -31,8 +30,8 @@ def prepare_currencies_data(currencies_data: dict):
         else:
             ccy1, ccy2 = ticker[:3], ticker[3:]
 
-        data[(ccy1, ccy2)] = float(values['ask'])
-        data[(ccy2, ccy1)] = 1 / float(values['bid'])
+        data[(ccy1, ccy2)] = 1 / float(values['ask'])
+        data[(ccy2, ccy1)] = float(values['bid'])
 
     return data
 
@@ -49,7 +48,7 @@ def calc_all_chains_spread(
         all_chains: list,
         mongo_collection: pymongo.collection,
         prices: dict,
-        min_spread: float = 0.9
+        min_spread: float = 0.35
 ):
     """Chains bruteforce for profitability and saving to MongoDB"""
 
@@ -73,14 +72,14 @@ def calc_all_chains_spread(
                 'side': 'BUY',
                 'type': 'LIMIT',
                 'price': prices[chain[1] + chain[0]]['ask'],
-                'quantity': AMOUNT
+                'quantity': AMOUNT * weights[(chain[0], chain[1])]
             },
             {
                 'symbol': mid_symbol,
                 'side': mid_side,
                 'type': 'LIMIT',
                 'price': prices[mid_symbol]['ask' if mid_side == 'BUY' else 'bid'],
-                'quantity': AMOUNT * weights[(chain[0], chain[1])]
+                'quantity': AMOUNT * weights[(chain[0], chain[1])] * weights[(chain[1], chain[2])]
             },
             {
                 'symbol': chain[2] + chain[3],
@@ -100,7 +99,6 @@ def calc_all_chains_spread(
 
         print('-----------------')
         print(*chain, sep=' -> ')
-        print(*chain_path, sep=' -> ')
         print('Spread: ' + str(spread) + '%')
 
         if spread >= min_spread:
@@ -126,9 +124,14 @@ if __name__ == '__main__':
         MONGO_PORT,
     )
 
-    # DB = crypto
+    mexc_client = MexcClient(
+        api_key=MEXC_ACCESS_KEY,
+        api_secret=MEXC_SECRET_KEY
+    )
+
+    # DB: crypto
     db = mongo_client.crypto
-    # Collection = mexc_spreads_3
+    # Collection: mexc_spreads_3
     mongo_spreads = db.mexc_spreads_3
 
     # Every 10sec searching for profitability chains
@@ -140,6 +143,9 @@ if __name__ == '__main__':
         if chain_orders is not None:
             break
 
-        time.sleep(10)
+        time.sleep(3)
 
-    print(chain_orders)
+    for order in chain_orders:
+        res = mexc_client.new_order(order)
+        print(res)
+        time.sleep(3)  # make constant

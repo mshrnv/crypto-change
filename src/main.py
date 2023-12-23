@@ -2,7 +2,7 @@
 import time
 import redis
 from mexc import MexcClient
-from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB
+from src.config import REDIS_HOST, REDIS_PORT, REDIS_DB, MEXC_ACCESS_KEY, MEXC_SECRET_KEY
 from src.utils import get_timestamp
 
 if __name__ == "__main__":
@@ -13,11 +13,15 @@ if __name__ == "__main__":
         db=REDIS_DB
     )
     # MEXC client
-    mexc = MexcClient()
+    mexc = MexcClient(
+        api_key=MEXC_ACCESS_KEY,
+        api_secret=MEXC_SECRET_KEY
+    )
 
     # Every 3sec updating redis with new tickers
     while True:
         tickers = mexc.get_data()
+        print(tickers)
 
         if not tickers:
             time.sleep(10)

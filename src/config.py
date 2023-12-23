@@ -9,3 +9,6 @@ MONGO_PORT = int(getenv("MONGO_PORT"))
 REDIS_HOST = getenv("REDIS_HOST")
 REDIS_PORT = int(getenv("REDIS_PORT"))
 REDIS_DB = int(getenv("REDIS_DB"))
+
+MEXC_ACCESS_KEY = getenv("MEXC_ACCESS_KEY")
+MEXC_SECRET_KEY = getenv("MEXC_SECRET_KEY")
