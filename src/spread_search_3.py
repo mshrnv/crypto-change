@@ -30,8 +30,8 @@ def prepare_currencies_data(currencies_data: dict):
         else:
             ccy1, ccy2 = ticker[:3], ticker[3:]
 
-        data[(ccy1, ccy2)] = 1 / float(values['ask'])
-        data[(ccy2, ccy1)] = float(values['bid'])
+        data[(ccy1, ccy2)] = float(values['bid'])
+        data[(ccy2, ccy1)] = 1 / float(values['ask'])
 
     return data
 
@@ -48,7 +48,7 @@ def calc_all_chains_spread(
         all_chains: list,
         mongo_collection: pymongo.collection,
         prices: dict,
-        min_spread: float = 0.35
+        min_spread: float = 0.7
 ):
     """Chains bruteforce for profitability and saving to MongoDB"""
 

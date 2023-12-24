@@ -1,6 +1,6 @@
 """Constants"""
 
-AMOUNT = 8.05
+AMOUNT = 9.24
 
 # Needle pairs of crypto
 needle = [
@@ -35,10 +35,10 @@ chains = [
     # ['USDC', 'ELF', 'BTC', 'USDC'],
     # ['USDC', 'ETH', 'ELF', 'USDC'],
     # ['USDC', 'ELF', 'ETH', 'USDC'],
-    ['USDC', 'BTC', 'MX', 'USDC'],
+    # ['USDC', 'BTC', 'MX', 'USDC'],
     # ['USDC', 'MX', 'BTC', 'USDC'],
     ['USDC', 'ETH', 'MX', 'USDC'],
     # ['USDC', 'MX', 'ETH', 'USDC'],
-    ['USDC', 'ETH', 'XRP', 'USDC'],
+    # ['USDC', 'ETH', 'XRP', 'USDC'],
     # ['USDC', 'XRP', 'ETH', 'USDC'],
 ]
